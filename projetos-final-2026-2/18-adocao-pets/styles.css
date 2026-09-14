@@ -7,14 +7,14 @@
 
 /* Variáveis (Custom Properties) — facilitam manter o tema */
 :root {
-  --primary: #9a3412;
+  --primary: #12689a;
   --accent: #fed7aa;
   --bg: #fff8f0;
   --text: #1f2937;
   --muted: #6b7280;
   --card: #ffffff;
   --radius: 14px;
-  --shadow: 0 10px 30px rgba(0,0,0,.08);
+  --shadow: 0 10px 30px rgba(156, 25, 25, 0.08);
   --container: 1100px;
 }
 
@@ -194,4 +194,21 @@ footer a { color: var(--accent); text-decoration: none; }
   }
   .nav ul.open { display: flex; }
   .menu-toggle { display: block; }
+}
+
+.card{
+  width: 250px;
+  padding: 20px;
+  background: white;
+  border-radius: 20px;
+
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0;2);
+
+  transition: 0. 4s ease;
+}
+
+.card:hover {
+  transform: translate(Y)(-10px);
+
+  box-shadow: 0 15px 35px rgba(255, 105, 180, 0.5);
 }
