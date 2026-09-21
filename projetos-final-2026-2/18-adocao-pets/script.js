@@ -1,4 +1,3 @@
-
 // ========= Comum: menu mobile, ano no rodapé =========
 document.addEventListener('DOMContentLoaded', () => {
   // Preenche o ano automaticamente no footer
@@ -65,3 +64,82 @@ filtros.addEventListener('click', (e) => {
 // Marca o primeiro filtro como ativo e renderiza
 filtros.querySelector('.filtro-btn')?.classList.add('ativo');
 renderizar();
+const formContato = document.getElementById("formContato");
+
+const mensagemSucesso =
+  document.getElementById("mensagemSucesso");
+
+
+formContato.addEventListener("submit", function(event) {
+
+  event.preventDefault();
+
+
+  // PEGAR OS DADOS DO FORMULÁRIO
+  const nome =
+    document.getElementById("nome").value.trim();
+
+  const email =
+    document.getElementById("email").value.trim();
+
+  const telefone =
+    document.getElementById("telefone").value.trim();
+
+  const pet =
+    document.getElementById("pet").value;
+
+  const mensagem =
+    document.getElementById("mensagem").value.trim();
+
+
+  // NÚMERO DO SEU WHATSAPP
+  // Coloque seu número com código do país.
+  // Exemplo: 5511999999999
+  const numeroWhatsApp = "5511999999999";
+
+
+  // MONTAR A MENSAGEM
+  const texto = `
+🐾 *NOVO INTERESSE EM ADOÇÃO*
+
+👤 *Nome:* ${nome}
+
+📧 *E-mail:* ${email}
+
+📱 *Telefone:* ${telefone}
+
+🐶 *Pet escolhido:* ${pet}
+
+💬 *Mensagem:*
+${mensagem}
+
+❤️ Enviado pelo site Adote um Amigo.
+  `;
+
+
+  // TRANSFORMAR A MENSAGEM EM URL
+  const mensagemCodificada =
+    encodeURIComponent(texto);
+
+
+  // LINK DO WHATSAPP
+  const linkWhatsApp =
+    `https://wa.me/${numeroWhatsApp}?text=${mensagemCodificada}`;
+
+
+  // MOSTRAR MENSAGEM DE SUCESSO
+  mensagemSucesso.textContent =
+    "🐾 Formulário preenchido! Você será direcionado para o WhatsApp. ❤️";
+
+  mensagemSucesso.classList.add("mostrar");
+
+
+  // ABRIR WHATSAPP
+  window.open(linkWhatsApp, "_blank");
+
+
+  // LIMPAR FORMULÁRIO
+  formContato.reset();
+
+});
+
