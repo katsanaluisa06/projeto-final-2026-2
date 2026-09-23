@@ -1,106 +1,377 @@
-// ========= Comum: menu mobile, ano no rodapé =========
-document.addEventListener('DOMContentLoaded', () => {
-  // Preenche o ano automaticamente no footer
-  const ano = document.getElementById('ano');
-  if (ano) ano.textContent = new Date().getFullYear();
+// =====================================================
+// MENU MOBILE + ANO DO RODAPÉ
+// =====================================================
 
-  // Menu mobile (toggle)
-  const toggle = document.querySelector('.menu-toggle');
-  const menu = document.getElementById('menu');
-  if (toggle && menu) {
-    toggle.addEventListener('click', () => menu.classList.toggle('open'));
-    menu.querySelectorAll('a').forEach(a =>
-      a.addEventListener('click', () => menu.classList.remove('open'))
-    );
-  }
+document.addEventListener("DOMContentLoaded", () => {
+
+    // Atualiza o ano automaticamente
+    const ano = document.getElementById("ano");
+
+    if (ano) {
+        ano.textContent = new Date().getFullYear();
+    }
+
+
+    // Menu mobile
+    const toggle = document.querySelector(".menu-toggle");
+    const menu = document.getElementById("menu");
+
+    if (toggle && menu) {
+
+        toggle.addEventListener("click", () => {
+            menu.classList.toggle("open");
+        });
+
+
+        // Fecha o menu quando clicar em algum link
+        menu.querySelectorAll("a").forEach((a) => {
+
+            a.addEventListener("click", () => {
+                menu.classList.remove("open");
+            });
+
+        });
+
+    }
+
 });
 
-// ========= Catálogo com filtros =========
-const lista = document.getElementById('lista');
-const filtros = document.getElementById('filtros');
-let filtroAtivo = 'Todos';
 
-// Função pura: dado um filtro, devolve itens filtrados
+// =====================================================
+// CATÁLOGO + FILTROS
+// =====================================================
+
+const lista = document.getElementById("lista");
+const filtros = document.getElementById("filtros");
+
+let filtroAtivo = "Todos";
+
+
+// =====================================================
+// FILTRAR PETS
+// =====================================================
+
 function filtrar(itens, filtro) {
-  if (filtro === 'Todos') return itens;
-  return itens.filter(i => i.categoria === filtro);
+
+    if (filtro === "Todos") {
+        return itens;
+    }
+
+    return itens.filter((item) => {
+        return item.categoria === filtro;
+    });
+
 }
 
-// Formata preço se for número
+
+// =====================================================
+// FORMATAR PREÇO / IDADE
+// =====================================================
+
 function formatarPreco(valor) {
-  if (typeof valor === 'number') {
-    return 'R$ ' + valor.toLocaleString('pt-BR');
-  }
-  return window.LABEL_PRECO + ' ' + valor;
+
+    if (typeof valor === "number") {
+
+        return "R$ " + valor.toLocaleString("pt-BR");
+
+    }
+
+    // Caso LABEL_PRECO não exista
+    if (window.LABEL_PRECO) {
+
+        return window.LABEL_PRECO + " " + valor;
+
+    }
+
+    return valor;
+
 }
 
-// Renderiza os cards na tela
+
+// =====================================================
+// RENDERIZAR PETS
+// =====================================================
+
 function renderizar() {
-  const itens = filtrar(window.ITENS, filtroAtivo);
-  if (itens.length === 0) {
-    lista.innerHTML = '<p class="vazio">Nenhum item encontrado.</p>';
-    return;
-  }
-  lista.innerHTML = itens.map(i => `
-    <article class="item-card">
-      <div class="img">${i.emoji}</div>
-      <h3>${i.nome}</h3>
-      <p>${i.categoria}</p>
-      <p class="preco">${formatarPreco(i.preco)}</p>
-    </article>
-  `).join('');
+
+    // Verifica se existem itens
+    if (!window.ITENS || !Array.isArray(window.ITENS)) {
+
+        if (lista) {
+
+            lista.innerHTML = `
+                <p class="vazio">
+                    Nenhum pet disponível no momento. 🐾
+                </p>
+            `;
+
+        }
+
+        return;
+    }
+
+
+    const itens = filtrar(window.ITENS, filtroAtivo);
+
+
+    // Nenhum pet encontrado
+    if (itens.length === 0) {
+
+        lista.innerHTML = `
+            <p class="vazio">
+                Nenhum pet encontrado. 🐾
+            </p>
+        `;
+
+        return;
+    }
+
+
+    // Criar os cards
+    lista.innerHTML = itens.map((item) => {
+
+        return `
+            <article class="item-card">
+
+                <div class="img">
+                    ${item.emoji || "🐾"}
+                </div>
+
+
+                <h3>
+                    ${item.nome}
+                </h3>
+
+
+                <p>
+                    ${item.categoria}
+                </p>
+
+
+                <p class="preco">
+                    ${formatarPreco(item.preco)}
+                </p>
+
+
+                <button
+                    class="btn-adotar"
+                    onclick="adotarPet('${item.nome}')">
+
+                    💗 Quero Adotar
+
+                </button>
+
+            </article>
+        `;
+
+    }).join("");
+
 }
 
-// Eventos nos botões de filtro
-filtros.addEventListener('click', (e) => {
-  const btn = e.target.closest('.filtro-btn');
-  if (!btn) return;
-  filtroAtivo = btn.dataset.filtro;
-  filtros.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('ativo'));
-  btn.classList.add('ativo');
-  renderizar();
-});
 
-// Marca o primeiro filtro como ativo e renderiza
-filtros.querySelector('.filtro-btn')?.classList.add('ativo');
-renderizar();
+// =====================================================
+// BOTÕES DOS FILTROS
+// =====================================================
+
+if (filtros) {
+
+    filtros.addEventListener("click", (event) => {
+
+        const botao = event.target.closest(".filtro-btn");
+
+
+        // Se não clicou em um botão de filtro
+        if (!botao) {
+            return;
+        }
+
+
+        // Define o filtro
+        filtroAtivo = botao.dataset.filtro;
+
+
+        // Remove classe ativo de todos
+        filtros
+            .querySelectorAll(".filtro-btn")
+            .forEach((btn) => {
+
+                btn.classList.remove("ativo");
+
+            });
+
+
+        // Ativa o botão clicado
+        botao.classList.add("ativo");
+
+
+        // Atualiza os pets
+        renderizar();
+
+    });
+
+
+    // Primeiro filtro ativo
+    const primeiroFiltro =
+        filtros.querySelector(".filtro-btn");
+
+
+    if (primeiroFiltro) {
+
+        primeiroFiltro.classList.add("ativo");
+
+    }
+
+}
+
+
+// =====================================================
+// BOTÃO "QUERO ADOTAR"
+// =====================================================
+
+function adotarPet(nome) {
+
+    alert(
+        "💗 Você escolheu adotar o " +
+        nome +
+        "!\n\n" +
+        "Entre em contato para saber mais sobre a adoção. 🐾"
+    );
+
+}
+
+
+// =====================================================
+// IR PARA A SEÇÃO DE PETS
+// =====================================================
+
+function irParaPets() {
+
+    const pets = document.getElementById("pets");
+
+
+    if (pets) {
+
+        pets.scrollIntoView({
+            behavior: "smooth"
+        });
+
+    }
+
+}
+
+
+// =====================================================
+// FAVORITAR PET
+// =====================================================
+
+function favoritar(botao) {
+
+    if (!botao) {
+        return;
+    }
+
+
+    if (botao.textContent.trim() === "♡") {
+
+        botao.textContent = "♥";
+
+        botao.style.transform = "scale(1.3)";
+
+
+        setTimeout(() => {
+
+            botao.style.transform = "scale(1)";
+
+        }, 200);
+
+    } else {
+
+        botao.textContent = "♡";
+
+    }
+
+}
+
+
+// =====================================================
+// BOTÃO VOLTAR AO TOPO
+// =====================================================
+
+const botaoTopo =
+    document.getElementById("topo");
+
+
+if (botaoTopo) {
+
+    // Esconde o botão inicialmente
+    botaoTopo.style.display = "none";
+
+
+    window.addEventListener("scroll", () => {
+
+        if (window.scrollY > 400) {
+
+            botaoTopo.style.display = "block";
+
+        } else {
+
+            botaoTopo.style.display = "none";
+
+        }
+
+    });
+
+}
+
+
+// Função para voltar ao topo
+function voltarTopo() {
+
+    window.scrollTo({
+
+        top: 0,
+
+        behavior: "smooth"
+
+    });
+
+}
+
+// =====================================================
+// FORMULÁRIO DE CONTATO / ADOÇÃO
+// =====================================================
+
 const formContato = document.getElementById("formContato");
+const mensagemSucesso = document.getElementById("mensagemSucesso");
 
-const mensagemSucesso =
-  document.getElementById("mensagemSucesso");
+if (formContato) {
 
+    formContato.addEventListener("submit", function(event) {
 
-formContato.addEventListener("submit", function(event) {
+        // Impede QUALQUER envio normal do formulário
+        event.preventDefault();
+        event.stopImmediatePropagation();
 
-  event.preventDefault();
+        // Pega os dados
+        const nome = document.getElementById("nome").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const telefone = document.getElementById("telefone").value.trim();
+        const pet = document.getElementById("pet").value;
+        const mensagem = document.getElementById("mensagem").value.trim();
 
+        // =================================================
+        // SEU NÚMERO DO WHATSAPP
+        // =================================================
 
-  // PEGAR OS DADOS DO FORMULÁRIO
-  const nome =
-    document.getElementById("nome").value.trim();
-
-  const email =
-    document.getElementById("email").value.trim();
-
-  const telefone =
-    document.getElementById("telefone").value.trim();
-
-  const pet =
-    document.getElementById("pet").value;
-
-  const mensagem =
-    document.getElementById("mensagem").value.trim();
+        const numeroWhatsApp = "5511999999999";
 
 
-  // NÚMERO DO SEU WHATSAPP
-  // Coloque seu número com código do país.
-  // Exemplo: 5511999999999
-  const numeroWhatsApp = "5511999999999";
+        // =================================================
+        // MENSAGEM
+        // =================================================
 
-
-  // MONTAR A MENSAGEM
-  const texto = `
-🐾 *NOVO INTERESSE EM ADOÇÃO*
+        const texto =
+`🐾 *NOVO INTERESSE EM ADOÇÃO*
 
 👤 *Nome:* ${nome}
 
@@ -113,33 +384,58 @@ formContato.addEventListener("submit", function(event) {
 💬 *Mensagem:*
 ${mensagem}
 
-❤️ Enviado pelo site Adote um Amigo.
-  `;
+❤️ Enviado pelo site Adote um Amigo.`;
 
 
-  // TRANSFORMAR A MENSAGEM EM URL
-  const mensagemCodificada =
-    encodeURIComponent(texto);
+        // =================================================
+        // LINK DO WHATSAPP
+        // =================================================
+
+        const linkWhatsApp =
+            "https://wa.me/" +
+            numeroWhatsApp +
+            "?text=" +
+            encodeURIComponent(texto);
 
 
-  // LINK DO WHATSAPP
-  const linkWhatsApp =
-    `https://wa.me/${numeroWhatsApp}?text=${mensagemCodificada}`;
+        // =================================================
+        // MENSAGEM DE SUCESSO
+        // =================================================
+
+        if (mensagemSucesso) {
+
+            mensagemSucesso.textContent =
+                "🐾 Formulário preenchido! Abrindo o WhatsApp... ❤️";
+
+            mensagemSucesso.classList.add("mostrar");
+
+        }
 
 
-  // MOSTRAR MENSAGEM DE SUCESSO
-  mensagemSucesso.textContent =
-    "🐾 Formulário preenchido! Você será direcionado para o WhatsApp. ❤️";
+        // =================================================
+        // ABRIR WHATSAPP
+        // =================================================
 
-  mensagemSucesso.classList.add("mostrar");
+        const link = document.createElement("a");
+
+        link.href = linkWhatsApp;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        document.body.removeChild(link);
 
 
-  // ABRIR WHATSAPP
-  window.open(linkWhatsApp, "_blank");
+        // =================================================
+        // LIMPAR FORMULÁRIO
+        // =================================================
 
+        formContato.reset();
 
-  // LIMPAR FORMULÁRIO
-  formContato.reset();
+    }, true);
 
-});
+}
 
